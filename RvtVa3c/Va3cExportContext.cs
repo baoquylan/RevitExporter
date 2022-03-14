@@ -595,7 +595,7 @@ namespace RvtVa3c
 
                 }
 
-                SetCurrentMaterial(m.UniqueId);
+                SetCurrentMaterial(m.UniqueId, assestId);
             }
             else
             {
