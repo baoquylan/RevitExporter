@@ -43,6 +43,26 @@ namespace RvtVa3c
             public bool transparent { get; set; } // false
             [DataMember]
             public bool wireframe { get; set; } // false
+            [DataMember]
+            public string map { get; set; }
+        }
+        public class Va3cTexture
+        {
+            [DataMember]
+            public string uuid { get; set; }
+            [DataMember]
+            public string image { get; set; }
+            [DataMember]
+            public List<string> wrap { get; set; }
+            [DataMember]
+            public List<int> repeat { get; set; }
+        }
+        public class Va3cImage
+        {
+            [DataMember]
+            public string uuid { get; set; }
+            [DataMember]
+            public string url { get; set; }
         }
 
         [DataContract]
@@ -217,5 +237,9 @@ namespace RvtVa3c
         public List<Va3cGeometry> geometries;
         [DataMember]
         public List<Va3cMaterial> materials;
+        [DataMember]
+        public List<Va3cTexture> textures;
+        [DataMember]
+        public List<Va3cImage> images;
     }
 }
