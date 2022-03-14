@@ -7,6 +7,7 @@ using System.IO;
 using Autodesk.Revit.DB;
 //using Autodesk.Revit.Utility;
 using Newtonsoft.Json;
+using Autodesk.Revit.DB.Visual;
 #endregion // Namespaces
 
 namespace RvtVa3c
@@ -236,7 +237,8 @@ namespace RvtVa3c
         Dictionary<string, Va3cContainer.Va3cMaterial> _materials;
         Dictionary<string, Va3cContainer.Va3cObject> _objects;
         Dictionary<string, Va3cContainer.Va3cGeometry> _geometries;
-
+        Dictionary<string, Va3cContainer.Va3cTexture> _textures;
+        Dictionary<string, Va3cContainer.Va3cImage> _images;
         Va3cContainer.Va3cObject _currentElement;
 
         // Keyed on material uid to handle several materials per element:
@@ -292,7 +294,7 @@ namespace RvtVa3c
         /// <summary>
         /// Set the current material
         /// </summary>
-        void SetCurrentMaterial(string uidMaterial)
+        void SetCurrentMaterial(string uidMaterial, string assestId = null)
         {
             if (!_materials.ContainsKey(uidMaterial))
             {
@@ -318,6 +320,10 @@ namespace RvtVa3c
                 m.opacity = 0.01 * (double)(100 - material.Transparency); // Revit has material.Transparency in [0,100], three.js expects opacity in [0.0,1.0]
                 m.transparent = 0 < material.Transparency;
                 m.wireframe = false;
+                if (assestId != null)
+                {
+                    m.map = assestId;
+                }
 
                 _materials.Add(uidMaterial, m);
             }
@@ -396,6 +402,8 @@ namespace RvtVa3c
             _materials = new Dictionary<string, Va3cContainer.Va3cMaterial>();
             _geometries = new Dictionary<string, Va3cContainer.Va3cGeometry>();
             _objects = new Dictionary<string, Va3cContainer.Va3cObject>();
+            _textures = new Dictionary<string, Va3cContainer.Va3cTexture>();
+            _images = new Dictionary<string, Va3cContainer.Va3cImage>();
 
             _transformationStack.Push(Transform.Identity);
 
@@ -433,6 +441,9 @@ namespace RvtVa3c
 
             _container.obj.children = _objects.Values.ToList();
 
+            _container.textures = _textures.Values.ToList();
+
+            _container.images = _images.Values.ToList();
             // Serialise scene
 
             //using( FileStream stream
@@ -529,7 +540,61 @@ namespace RvtVa3c
 
             if (ElementId.InvalidElementId != id)
             {
+                string assestId = "";
                 Element m = _doc.GetElement(node.MaterialId);
+                ElementId appearanceAssetId = (m as Material).AppearanceAssetId;
+                AppearanceAssetElement appearanceAssetElem = _doc.GetElement(appearanceAssetId) as AppearanceAssetElement;
+                Asset asset = appearanceAssetElem.GetRenderingAsset();
+                int size = asset.Size;
+                for (int assetIdx = 0; assetIdx < size; assetIdx++)
+                {
+                    AssetProperty aProperty = asset[assetIdx];
+
+                    if (aProperty.NumberOfConnectedProperties < 1) continue;
+                    if (aProperty.Name != "generic_diffuse") continue;
+                    Asset connectedAsset = aProperty
+                      .GetConnectedProperty(0) as Asset;
+
+                    if (connectedAsset.Name == "UnifiedBitmapSchema")
+                    {
+                        AssetPropertyString assetPropertyString = connectedAsset.FindByName(UnifiedBitmap.UnifiedbitmapBitmap)
+                            as AssetPropertyString;
+                        string path = "";
+                        if (File.Exists(assetPropertyString.Value))
+                        {
+                            path = assetPropertyString.Value;
+                        }
+                        else
+                        {
+                            path = @"C:\Program Files (x86)\Common Files\Autodesk Shared\Materials\Textures\" + assetPropertyString.Value;
+
+                        }
+                        if (File.Exists(path))
+                        {
+                            Byte[] bytes = File.ReadAllBytes(path);
+                            String file = Convert.ToBase64String(bytes);
+                            var texture = "data:image/png;base64," + file;
+                            assestId = appearanceAssetElem.UniqueId;
+                            Va3cContainer.Va3cTexture tx = new Va3cContainer.Va3cTexture();
+                            tx.uuid = appearanceAssetElem.UniqueId;
+                            tx.image = path;
+                            tx.wrap = new List<string>() { "repeat", "repeat" };
+                            tx.repeat = new List<int>() { 2, 2 };
+
+                            Va3cContainer.Va3cImage img = new Va3cContainer.Va3cImage();
+                            img.uuid = path;
+                            img.url = texture;
+
+                            if (!_textures.ContainsKey(appearanceAssetId.ToString()))
+                                _textures.Add(appearanceAssetElem.UniqueId, tx);
+                            if (!_images.ContainsKey(path))
+                                _images.Add(path, img);
+                        }
+                    }
+
+
+                }
+
                 SetCurrentMaterial(m.UniqueId);
             }
             else
