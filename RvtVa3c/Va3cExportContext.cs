@@ -37,14 +37,14 @@ namespace RvtVa3c
         /// </summary>
         double _scale_bim = 1.0;
 
-        /// <summary>
-        /// Scale applied to each vertex in each individual 
-        /// BIM element. This can be used to scale the model 
-        /// down from millimetres to metres, e.g.
-        /// Currently we stick with millimetres after all
-        /// at this level.
-        /// </summary>
-        double _scale_vertex = 1.0;
+        ///// <summary>
+        ///// Scale applied to each vertex in each individual 
+        ///// BIM element. This can be used to scale the model 
+        ///// down from millimetres to metres, e.g.
+        ///// Currently we stick with millimetres after all
+        ///// at this level.
+        ///// </summary>
+        //double _scale_vertex = 1.0;
 
         /// <summary>
         /// If true, switch Y and Z coordinate 
@@ -311,7 +311,7 @@ namespace RvtVa3c
 
                 m.uuid = uidMaterial;
                 m.name = material.Name;
-                m.type = "MeshPhongMaterial";
+                m.type = "MeshBasicMaterial";
                 m.color = Util.ColorToInt(material.Color);
                 m.ambient = m.color;
                 m.emissive = 0;
@@ -616,7 +616,7 @@ namespace RvtVa3c
                       = new Va3cContainer.Va3cMaterial();
 
                     m.uuid = uid;
-                    m.type = "MeshPhongMaterial";//MeshPhongMaterial MeshBasicMaterial
+                    m.type = "MeshBasicMaterial";//MeshPhongMaterial MeshBasicMaterial
                     m.color = iColor;
                     m.ambient = m.color;
                     m.emissive = 0;
