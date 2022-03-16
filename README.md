@@ -57,7 +57,7 @@ Updated and maintained by LanBao
 
 ## About
 
-The project inspired by [RvtVa3C]https://github.com/va3c/RvtVa3c and was forked for research purpose
+The project inspired by [RvtVa3C](https://github.com/va3c/RvtVa3c) and was forked for research purpose
 
 
 ## <a name="license"></a>License
