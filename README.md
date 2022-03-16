@@ -44,7 +44,7 @@ For more details on programming Revit add-ins in general, please refer to the [R
 ## New
 
 * Updated for Threejs version >= 125
-* Add texture for exported
+* Add texture for exporter
 * Change dimension from millimeters to meters
 
 ## Wishlist
