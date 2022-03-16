@@ -8,6 +8,8 @@ using Autodesk.Revit.DB;
 //using Autodesk.Revit.Utility;
 using Newtonsoft.Json;
 using Autodesk.Revit.DB.Visual;
+using System.Security.Cryptography;
+using System.Text;
 #endregion // Namespaces
 
 namespace RvtVa3c
@@ -411,7 +413,7 @@ namespace RvtVa3c
 
             _container.metadata = new Va3cContainer.Metadata();
             _container.metadata.type = "Object";
-            _container.metadata.version = 4.3;
+            _container.metadata.version = 4.4;
             _container.metadata.generator = "RvtVa3c Revit vA3C exporter";
             _container.geometries = new List<Va3cContainer.Va3cGeometry>();
 
@@ -484,7 +486,7 @@ namespace RvtVa3c
             //  polymesh.DistributionOfNormals ) );
 
             IList<XYZ> pts = polymesh.GetPoints();
-
+            List<UV> uvs = polymesh.GetUVs().ToList();
             Transform t = CurrentTransform;
 
             pts = pts.Select(p => t.OfPoint(p)).ToList();
@@ -493,6 +495,7 @@ namespace RvtVa3c
          
 
             int count = 0;
+
             foreach (PolymeshFacet facet in polymesh.GetFacets())
             {
                 //Debug.WriteLine( string.Format(
@@ -501,21 +504,33 @@ namespace RvtVa3c
                 var p1 = new PointInt(pts[facet.V1], _switch_coordinates);
                 var p2 = new PointInt(pts[facet.V2], _switch_coordinates);
                 var p3 = new PointInt(pts[facet.V3], _switch_coordinates);
+
+                var uv1 = uvs[facet.V1];
+                var uv2 = uvs[facet.V2];
+                var uv3 = uvs[facet.V3];
+
+                //var p4 = new PointInt(pts[facet.V3], _switch_coordinates);
+                //var p5 = new PointInt(pts[facet.V3], _switch_coordinates);
                 //v1 = CurrentVerticesPerMaterial.AddVertex(p1);
                 //v2 = CurrentVerticesPerMaterial.AddVertex(p2);
                 //v3 = CurrentVerticesPerMaterial.AddVertex(p3);
 
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p1.X);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p1.Y);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p1.Z);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p2.X);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p2.Y);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p2.Z);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p3.X);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p3.Y);
-                CurrentGeometryPerMaterial.data.attributes.position.array.Add(p3.Z);
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p1.X, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p1.Y, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p1.Z, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p2.X, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p2.Y, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p2.Z, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p3.X, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p3.Y, 5));
+                CurrentGeometryPerMaterial.data.attributes.position.array.Add(Math.Round(p3.Z, 5));
 
-
+                CurrentGeometryPerMaterial.data.attributes.uv.array.Add(Math.Round(uv1.U, 4));
+                CurrentGeometryPerMaterial.data.attributes.uv.array.Add(Math.Round(uv1.V, 4));
+                CurrentGeometryPerMaterial.data.attributes.uv.array.Add(Math.Round(uv2.U, 4));
+                CurrentGeometryPerMaterial.data.attributes.uv.array.Add(Math.Round(uv2.V, 4));
+                CurrentGeometryPerMaterial.data.attributes.uv.array.Add(Math.Round(uv3.U, 4));
+                CurrentGeometryPerMaterial.data.attributes.uv.array.Add(Math.Round(uv3.V, 4));
                 //CurrentGeometryPerMaterial.data.index.array.Add(facet.V1);
                 //CurrentGeometryPerMaterial.data.index.array.Add(facet.V2);
                 //CurrentGeometryPerMaterial.data.index.array.Add(facet.V3);
@@ -582,13 +597,20 @@ namespace RvtVa3c
                             tx.repeat = new List<int>() { 2, 2 };
 
                             Va3cContainer.Va3cImage img = new Va3cContainer.Va3cImage();
-                            img.uuid = path;
+                            string input = path;
+                            string guidImg = "";
+                            using (MD5 md5 = MD5.Create())
+                            {
+                                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(input));
+                                guidImg = new Guid(hash).ToString();
+                            }
+                            img.uuid = guidImg;
                             img.url = texture;
-
-                            if (!_textures.ContainsKey(appearanceAssetId.ToString()))
+                            if (!_textures.ContainsKey(appearanceAssetElem.UniqueId))
                                 _textures.Add(appearanceAssetElem.UniqueId, tx);
-                            if (!_images.ContainsKey(path))
-                                _images.Add(path, img);
+
+                            if (!_images.ContainsKey(guidImg))
+                                _images.Add(guidImg, img);
                         }
                     }
 

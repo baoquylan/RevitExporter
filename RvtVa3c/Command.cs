@@ -364,7 +364,7 @@ namespace RvtVa3c
         }
       }
 
-      filename = Path.GetFileName( filename ) + ".js";
+      filename = Path.GetFileNameWithoutExtension( filename ) + ".js";
 
       if( !SelectFile( ref _output_folder_path,
         ref filename ) )
