@@ -35,6 +35,7 @@ the [Revit online help](http://help.autodesk.com/view/RVT/2017/ENU) &gt; Develop
 
 For more details on programming Revit add-ins in general, please refer to the [Revit API Getting Started](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2) material, especially the DevTV and My First Revit Plugin tutorials.
 
+![alt text](https://github.com/baoquylan/RvtVa3c/blob/master/image/demo.gif?raw=true)
 
 ## Tools and Technologies
 
