@@ -592,7 +592,7 @@ namespace RvtVa3c
                             assestId = appearanceAssetElem.UniqueId;
                             Va3cContainer.Va3cTexture tx = new Va3cContainer.Va3cTexture();
                             tx.uuid = appearanceAssetElem.UniqueId;
-                            tx.image = path;
+                 
                             tx.wrap = new List<string>() { "repeat", "repeat" };
                             tx.repeat = new List<int>() { 2, 2 };
 
@@ -604,6 +604,7 @@ namespace RvtVa3c
                                 byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(input));
                                 guidImg = new Guid(hash).ToString();
                             }
+                            tx.image = guidImg;
                             img.uuid = guidImg;
                             img.url = texture;
                             if (!_textures.ContainsKey(appearanceAssetElem.UniqueId))
