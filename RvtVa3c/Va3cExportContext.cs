@@ -313,7 +313,7 @@ namespace RvtVa3c
 
                 m.uuid = uidMaterial;
                 m.name = material.Name;
-                m.type = "MeshBasicMaterial";
+                m.type = "MeshPhongMaterial";
                 m.color = Util.ColorToInt(material.Color);
                 m.ambient = m.color;
                 m.emissive = 0;
@@ -639,7 +639,7 @@ namespace RvtVa3c
                       = new Va3cContainer.Va3cMaterial();
 
                     m.uuid = uid;
-                    m.type = "MeshBasicMaterial";//MeshPhongMaterial MeshBasicMaterial
+                    m.type = "MeshPhongMaterial";//MeshPhongMaterial MeshBasicMaterial
                     m.color = iColor;
                     m.ambient = m.color;
                     m.emissive = 0;
@@ -796,7 +796,7 @@ namespace RvtVa3c
             }
 
             Dictionary<string, string> d
-              = Util.GetElementProperties(e, false);
+              = Util.GetElementProperties(e, true);
 
             _currentElement.userData = d;
 

@@ -177,9 +177,9 @@ namespace RvtVa3c
                 ? string.Empty
                 : fi.Symbol.Name + " ";
 
-            return string.Format("{0} {1}{2}{3}<{4} {5}>",
-              typeName, categoryName, familyName,
-              symbolName, e.Id.IntegerValue, e.Name);
+            return string.Format("{0}||{1}||{2}||{3}||<{4} {5}>",
+            categoryName,  typeName, symbolName ,familyName
+              , e.Id.IntegerValue, e.Name);
         }
 
         /// <summary>
